@@ -1,0 +1,489 @@
+{
+  "model_version": "yolov8s:1f47a78bf100",
+  "weights_sha256": "1f47a78bf100391c2a140b7ac73a1caae18c32779be7d310658112f7ac9aa78a",
+  "config_hash": "153b50b695e9cddcab8e9f59792e2fa82c54f7041bbd720d31ccf2a4fa500505",
+  "detection_score_threshold": 0.25,
+  "input_size_px": 640,
+  "iou_threshold": 0.5,
+  "eval_set": "data\\vision\\eval_set",
+  "eval_set_source": "COCO 2017 val (http://cocodataset.org), open licensed",
+  "conditions": {
+    "base": {
+      "per_class": {
+        "person": {
+          "precision": 0.7935,
+          "recall": 0.7122,
+          "f1": 0.7506,
+          "tp": 146,
+          "fp": 38,
+          "fn": 59
+        },
+        "small": {
+          "precision": 0.6,
+          "recall": 0.1731,
+          "f1": 0.2687,
+          "tp": 9,
+          "fp": 6,
+          "fn": 43
+        },
+        "large": {
+          "precision": 0.7273,
+          "recall": 1.0,
+          "f1": 0.8421,
+          "tp": 8,
+          "fp": 3,
+          "fn": 0
+        }
+      },
+      "macro_f1": 0.6205,
+      "images_evaluated": 60,
+      "images_with_errors": 36
+    },
+    "low_light": {
+      "per_class": {
+        "person": {
+          "precision": 0.8286,
+          "recall": 0.7073,
+          "f1": 0.7632,
+          "tp": 145,
+          "fp": 30,
+          "fn": 60
+        },
+        "small": {
+          "precision": 0.5789,
+          "recall": 0.2115,
+          "f1": 0.3099,
+          "tp": 11,
+          "fp": 8,
+          "fn": 41
+        },
+        "large": {
+          "precision": 0.6364,
+          "recall": 0.875,
+          "f1": 0.7368,
+          "tp": 7,
+          "fp": 4,
+          "fn": 1
+        }
+      },
+      "macro_f1": 0.6033,
+      "images_evaluated": 60,
+      "images_with_errors": 36
+    },
+    "occlusion": {
+      "per_class": {
+        "person": {
+          "precision": 0.5279,
+          "recall": 0.5073,
+          "f1": 0.5174,
+          "tp": 104,
+          "fp": 93,
+          "fn": 101
+        },
+        "small": {
+          "precision": 0.4667,
+          "recall": 0.1346,
+          "f1": 0.209,
+          "tp": 7,
+          "fp": 8,
+          "fn": 45
+        },
+        "large": {
+          "precision": 0.3,
+          "recall": 0.375,
+          "f1": 0.3333,
+          "tp": 3,
+          "fp": 7,
+          "fn": 5
+        }
+      },
+      "macro_f1": 0.3532,
+      "images_evaluated": 60,
+      "images_with_errors": 44
+    },
+    "clutter": {
+      "per_class": {
+        "person": {
+          "precision": 0.7582,
+          "recall": 0.6732,
+          "f1": 0.7132,
+          "tp": 138,
+          "fp": 44,
+          "fn": 67
+        },
+        "small": {
+          "precision": 0.3333,
+          "recall": 0.1731,
+          "f1": 0.2278,
+          "tp": 9,
+          "fp": 18,
+          "fn": 43
+        },
+        "large": {
+          "precision": 0.4375,
+          "recall": 0.875,
+          "f1": 0.5833,
+          "tp": 7,
+          "fp": 9,
+          "fn": 1
+        }
+      },
+      "macro_f1": 0.5081,
+      "images_evaluated": 60,
+      "images_with_errors": 43
+    }
+  },
+  "occupancy_confusion_matrix": {
+    "labels": [
+      "EMPTY",
+      "P2",
+      "P4",
+      "P6",
+      "OTHER"
+    ],
+    "matrix": [
+      [
+        80,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        17,
+        3,
+        0,
+        14
+      ],
+      [
+        0,
+        4,
+        13,
+        5,
+        18
+      ],
+      [
+        2,
+        2,
+        2,
+        8,
+        18
+      ],
+      [
+        1,
+        8,
+        6,
+        0,
+        33
+      ]
+    ],
+    "macro_f1": 0.5382,
+    "per_bucket_f1": {
+      "EMPTY": 0.9467,
+      "P2": 0.4789,
+      "P4": 0.4062,
+      "P6": 0.3556,
+      "OTHER": 0.5038
+    }
+  },
+  "failure_examples": {
+    "base": [
+      {
+        "image_id": 139,
+        "true_persons": 2,
+        "predicted_persons": 1,
+        "detections": 1
+      },
+      {
+        "image_id": 1000,
+        "true_persons": 12,
+        "predicted_persons": 13,
+        "detections": 14
+      },
+      {
+        "image_id": 1268,
+        "true_persons": 4,
+        "predicted_persons": 4,
+        "detections": 5
+      },
+      {
+        "image_id": 1296,
+        "true_persons": 2,
+        "predicted_persons": 1,
+        "detections": 1
+      },
+      {
+        "image_id": 1353,
+        "true_persons": 6,
+        "predicted_persons": 6,
+        "detections": 7
+      },
+      {
+        "image_id": 2153,
+        "true_persons": 4,
+        "predicted_persons": 5,
+        "detections": 5
+      },
+      {
+        "image_id": 2431,
+        "true_persons": 2,
+        "predicted_persons": 2,
+        "detections": 2
+      },
+      {
+        "image_id": 2685,
+        "true_persons": 6,
+        "predicted_persons": 8,
+        "detections": 9
+      },
+      {
+        "image_id": 3255,
+        "true_persons": 6,
+        "predicted_persons": 6,
+        "detections": 6
+      },
+      {
+        "image_id": 5001,
+        "true_persons": 13,
+        "predicted_persons": 17,
+        "detections": 17
+      },
+      {
+        "image_id": 7511,
+        "true_persons": 13,
+        "predicted_persons": 5,
+        "detections": 5
+      },
+      {
+        "image_id": 8211,
+        "true_persons": 2,
+        "predicted_persons": 3,
+        "detections": 3
+      }
+    ],
+    "low_light": [
+      {
+        "image_id": 139,
+        "true_persons": 2,
+        "predicted_persons": 1,
+        "detections": 1
+      },
+      {
+        "image_id": 1000,
+        "true_persons": 12,
+        "predicted_persons": 11,
+        "detections": 12
+      },
+      {
+        "image_id": 1268,
+        "true_persons": 4,
+        "predicted_persons": 4,
+        "detections": 5
+      },
+      {
+        "image_id": 1296,
+        "true_persons": 2,
+        "predicted_persons": 1,
+        "detections": 1
+      },
+      {
+        "image_id": 1353,
+        "true_persons": 6,
+        "predicted_persons": 4,
+        "detections": 5
+      },
+      {
+        "image_id": 2431,
+        "true_persons": 2,
+        "predicted_persons": 0,
+        "detections": 0
+      },
+      {
+        "image_id": 2685,
+        "true_persons": 6,
+        "predicted_persons": 8,
+        "detections": 8
+      },
+      {
+        "image_id": 3255,
+        "true_persons": 6,
+        "predicted_persons": 6,
+        "detections": 6
+      },
+      {
+        "image_id": 5001,
+        "true_persons": 13,
+        "predicted_persons": 16,
+        "detections": 16
+      },
+      {
+        "image_id": 7511,
+        "true_persons": 13,
+        "predicted_persons": 4,
+        "detections": 4
+      },
+      {
+        "image_id": 8211,
+        "true_persons": 2,
+        "predicted_persons": 3,
+        "detections": 4
+      },
+      {
+        "image_id": 8690,
+        "true_persons": 4,
+        "predicted_persons": 3,
+        "detections": 3
+      }
+    ],
+    "occlusion": [
+      {
+        "image_id": 139,
+        "true_persons": 2,
+        "predicted_persons": 0,
+        "detections": 0
+      },
+      {
+        "image_id": 872,
+        "true_persons": 2,
+        "predicted_persons": 4,
+        "detections": 4
+      },
+      {
+        "image_id": 1000,
+        "true_persons": 12,
+        "predicted_persons": 14,
+        "detections": 15
+      },
+      {
+        "image_id": 1268,
+        "true_persons": 4,
+        "predicted_persons": 4,
+        "detections": 5
+      },
+      {
+        "image_id": 1296,
+        "true_persons": 2,
+        "predicted_persons": 4,
+        "detections": 4
+      },
+      {
+        "image_id": 1353,
+        "true_persons": 6,
+        "predicted_persons": 0,
+        "detections": 0
+      },
+      {
+        "image_id": 1993,
+        "true_persons": 0,
+        "predicted_persons": 0,
+        "detections": 1
+      },
+      {
+        "image_id": 2153,
+        "true_persons": 4,
+        "predicted_persons": 3,
+        "detections": 3
+      },
+      {
+        "image_id": 2431,
+        "true_persons": 2,
+        "predicted_persons": 3,
+        "detections": 3
+      },
+      {
+        "image_id": 2473,
+        "true_persons": 4,
+        "predicted_persons": 4,
+        "detections": 4
+      },
+      {
+        "image_id": 2685,
+        "true_persons": 6,
+        "predicted_persons": 12,
+        "detections": 12
+      },
+      {
+        "image_id": 3255,
+        "true_persons": 6,
+        "predicted_persons": 7,
+        "detections": 7
+      }
+    ],
+    "clutter": [
+      {
+        "image_id": 139,
+        "true_persons": 2,
+        "predicted_persons": 1,
+        "detections": 3
+      },
+      {
+        "image_id": 872,
+        "true_persons": 2,
+        "predicted_persons": 3,
+        "detections": 3
+      },
+      {
+        "image_id": 1000,
+        "true_persons": 12,
+        "predicted_persons": 13,
+        "detections": 14
+      },
+      {
+        "image_id": 1268,
+        "true_persons": 4,
+        "predicted_persons": 4,
+        "detections": 7
+      },
+      {
+        "image_id": 1296,
+        "true_persons": 2,
+        "predicted_persons": 2,
+        "detections": 2
+      },
+      {
+        "image_id": 1353,
+        "true_persons": 6,
+        "predicted_persons": 5,
+        "detections": 6
+      },
+      {
+        "image_id": 1993,
+        "true_persons": 0,
+        "predicted_persons": 0,
+        "detections": 1
+      },
+      {
+        "image_id": 2153,
+        "true_persons": 4,
+        "predicted_persons": 6,
+        "detections": 6
+      },
+      {
+        "image_id": 2431,
+        "true_persons": 2,
+        "predicted_persons": 3,
+        "detections": 3
+      },
+      {
+        "image_id": 2473,
+        "true_persons": 4,
+        "predicted_persons": 3,
+        "detections": 3
+      },
+      {
+        "image_id": 2685,
+        "true_persons": 6,
+        "predicted_persons": 6,
+        "detections": 8
+      },
+      {
+        "image_id": 3255,
+        "true_persons": 6,
+        "predicted_persons": 6,
+        "detections": 6
+      }
+    ]
+  },
+  "notes": "Evaluation frames are open-licensed COCO 2017 val images selected by person/luggage counts; low_light, occlusion and clutter apply seeded transformations with unchanged labels. This measures the cabin detection pipeline on this controlled set, not field performance in a vehicle cabin."
+}

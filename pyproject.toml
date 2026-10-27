@@ -1,0 +1,43 @@
+[project]
+name = "nexus7"
+version = "1.0.0"
+description = "NEXUS-7 mobility management demonstrator: fleet simulation, dispatch optimization, and live digital twin"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi==0.116.2",
+    "starlette==0.48.0",
+    "uvicorn==0.35.0",
+    "pydantic==2.11.9",
+    "numpy==2.4.4",
+    "scipy==1.16.2",
+    "ortools==9.14.6206",
+    "duckdb==1.4.2",
+    "pyarrow==25.0.1",
+    "pyyaml==6.0.2",
+    "httpx==0.28.1",
+    "websockets==10.4",
+    "opencv-python==4.13.0.92",
+    "torch==2.12.1",
+    "torchvision==0.27.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==9.0.2",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["backend/app/tests"]
+pythonpath = ["backend"]
+addopts = "-q --strict-markers"
+markers = [
+    "slow: long-running tests (model evaluation, benchmarks)",
+    "vision: tests that load the vision model weights",
+]
+
+[build-system]
+requires = ["setuptools==80.9.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["backend"]

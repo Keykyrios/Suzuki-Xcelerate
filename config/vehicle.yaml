@@ -1,0 +1,613 @@
+# NEXUS-7 concept vehicle: physical constants, package parameters, and model
+# coefficients. Every leaf is a parameter record:
+#   name, value, unit, status, source_or_rationale, [min, max, notes]
+# status is one of: OBSERVED_PUBLIC | MEASURED_LOCAL | SYNTHETIC |
+# SCENARIO_ASSUMPTION | DESIGN_TARGET | MODEL_ESTIMATE | RECONSTRUCTED |
+# UNCALIBRATED (see docs/adr/0010-evidence-status.md).
+
+version: "1.0.0"
+
+identity:
+  model_name:
+    name: vehicle model name
+    value: NEXUS-7
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Common compact high-roof e-MPV demonstrator platform"
+  platform:
+    name: body style
+    value: compact_high_roof_e-mpv
+    unit: "-"
+    status: DESIGN_TARGET
+    source_or_rationale: "Concept architecture: one common body for all cabin modes"
+
+package:
+  seating_total:
+    name: total seating including driver
+    value: 7
+    unit: "seats"
+    status: DESIGN_TARGET
+    source_or_rationale: "6 passengers + driver concept target"
+  passenger_capacity:
+    name: paying passenger capacity
+    value: 6
+    unit: "passengers"
+    status: DESIGN_TARGET
+    source_or_rationale: "6 passengers + driver concept target"
+  length_m:
+    name: vehicle length
+    value: 4.55
+    unit: "m"
+    status: DESIGN_TARGET
+    source_or_rationale: "Package target band 4.5-4.6 m"
+    min: 4.5
+    max: 4.6
+  width_m:
+    name: vehicle width
+    value: 1.80
+    unit: "m"
+    status: DESIGN_TARGET
+    source_or_rationale: "Package target"
+    min: 1.78
+    max: 1.82
+  height_m:
+    name: vehicle height
+    value: 1.72
+    unit: "m"
+    status: DESIGN_TARGET
+    source_or_rationale: "Package target band 1.70-1.75 m"
+    min: 1.70
+    max: 1.75
+  wheelbase_m:
+    name: wheelbase
+    value: 2.82
+    unit: "m"
+    status: DESIGN_TARGET
+    source_or_rationale: "Package target band 2.80-2.85 m"
+    min: 2.80
+    max: 2.85
+  ground_clearance_mm:
+    name: ground clearance
+    value: 170
+    unit: "mm"
+    status: DESIGN_TARGET
+    source_or_rationale: "Package target, not verified"
+  curb_mass_kg:
+    name: curb mass
+    value: 1700
+    unit: "kg"
+    status: DESIGN_TARGET
+    source_or_rationale: "Physics-model range 1650-1750 kg"
+    min: 1650
+    max: 1750
+  passenger_mass_kg:
+    name: mass per passenger
+    value: 75.0
+    unit: "kg"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Planning default including small personal baggage allowance"
+  other_payload_kg:
+    name: other payload allowance
+    value: 40.0
+    unit: "kg"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Driver mass plus sundry operational payload"
+  luggage_mass_per_unit_kg:
+    name: default mass per luggage unit
+    value: 15.0
+    unit: "kg"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Default when a scenario supplies luggage count without mass"
+  max_payload_kg:
+    name: maximum additional payload above curb mass
+    value: 550.0
+    unit: "kg"
+    status: DESIGN_TARGET
+    source_or_rationale: "Loaded mass band 2100-2250 kg implies payload headroom"
+  loaded_mass_target_min_kg:
+    name: loaded mass reference minimum
+    value: 2100
+    unit: "kg"
+    status: DESIGN_TARGET
+    source_or_rationale: "Physics-model range lower bound, sanity reference only"
+  loaded_mass_target_max_kg:
+    name: loaded mass reference maximum
+    value: 2250
+    unit: "kg"
+    status: DESIGN_TARGET
+    source_or_rationale: "Physics-model range upper bound, sanity reference only"
+  rear_seat_pitch_mm:
+    name: rear seat pitch in standard mode
+    value: 760
+    unit: "mm"
+    status: DESIGN_TARGET
+    source_or_rationale: "Package target, not verified"
+  airport_luggage_volume_l:
+    name: luggage volume in AIRPORT mode with four passengers
+    value: 450
+    unit: "L"
+    status: DESIGN_TARGET
+    source_or_rationale: "Package target, not verified"
+  design_life_km:
+    name: commercial design life
+    value: 450000
+    unit: "km"
+    status: DESIGN_TARGET
+    source_or_rationale: "Duty-cycle target, not validation evidence"
+  design_life_years:
+    name: commercial design life
+    value: 5
+    unit: "years"
+    status: DESIGN_TARGET
+    source_or_rationale: "Duty-cycle target, not validation evidence"
+
+aerodynamics:
+  drag_coefficient:
+    name: drag coefficient Cd
+    value: 0.29
+    unit: "-"
+    status: DESIGN_TARGET
+    source_or_rationale: "Physics-model range 0.28-0.30"
+    min: 0.28
+    max: 0.30
+  frontal_area_m2:
+    name: frontal area A
+    value: 2.62
+    unit: "m2"
+    status: DESIGN_TARGET
+    source_or_rationale: "Physics-model range 2.55-2.70 m2"
+    min: 2.55
+    max: 2.70
+
+resistance:
+  rolling_resistance_coefficient:
+    name: rolling resistance coefficient Crr
+    value: 0.0102
+    unit: "-"
+    status: DESIGN_TARGET
+    source_or_rationale: "Physics-model range 0.0095-0.011"
+    min: 0.0095
+    max: 0.011
+  air_density_kg_m3:
+    name: reference air density rho
+    value: 1.2
+    unit: "kg/m3"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "ISA sea-level reference density; kept constant for the demonstrator"
+  gravity_m_s2:
+    name: gravitational acceleration g
+    value: 9.80665
+    unit: "m/s2"
+    status: OBSERVED_PUBLIC
+    source_or_rationale: "CODATA standard gravity"
+
+drivetrain:
+  traction_efficiency:
+    name: drivetrain efficiency eta_drive
+    value: 0.91
+    unit: "-"
+    status: DESIGN_TARGET
+    source_or_rationale: "Model parameter band 0.90-0.92"
+    min: 0.90
+    max: 0.92
+  peak_traction_power_kw:
+    name: peak traction power
+    value: 120
+    unit: "kW"
+    status: DESIGN_TARGET
+    source_or_rationale: "Design target band 110-130 kW"
+    min: 110
+    max: 130
+  peak_traction_torque_nm:
+    name: peak traction torque
+    value: 250
+    unit: "Nm"
+    status: DESIGN_TARGET
+    source_or_rationale: "Derived from peak power and a 9.6 m/s base speed"
+  max_acceleration_m_s2:
+    name: maximum longitudinal acceleration used by the profile generator
+    value: 1.4
+    unit: "m/s2"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Comfort-limited urban acceleration for a shared cabin"
+  max_deceleration_m_s2:
+    name: maximum service deceleration used by the profile generator
+    value: 1.8
+    unit: "m/s2"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Comfort-limited urban braking for a shared cabin"
+
+regeneration:
+  recovery_fraction:
+    name: recoverable braking energy fraction
+    value: 0.70
+    unit: "-"
+    status: DESIGN_TARGET
+    source_or_rationale: "Recovery target band 65-75% subject to power and SOC limits"
+    min: 0.65
+    max: 0.75
+  max_regen_power_kw:
+    name: motor/inverter regeneration power limit
+    value: 90
+    unit: "kW"
+    status: DESIGN_TARGET
+    source_or_rationale: "Peak traction hardware limit applied in reverse"
+  path_efficiency:
+    name: regenerative path efficiency (wheel to battery)
+    value: 0.92
+    unit: "-"
+    status: DESIGN_TARGET
+    source_or_rationale: "Mirror of drivetrain efficiency on the recovery path"
+  min_speed_m_s:
+    name: low-speed regen cutoff
+    value: 1.5
+    unit: "m/s"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Regen faded out below walking pace to emulate creep control"
+
+auxiliary:
+  auxiliary_load_kw:
+    name: auxiliary load
+    value: 1.0
+    unit: "kW"
+    status: DESIGN_TARGET
+    source_or_rationale: "Model range 0.8-1.2 kW (lights, pumps, 12 V, compute)"
+    min: 0.8
+    max: 1.2
+
+hvac:
+  base_load_kw:
+    name: cabin HVAC base load
+    value: 1.0
+    unit: "kW"
+    status: DESIGN_TARGET
+    source_or_rationale: "Model range 1.0-3.5 kW including climate control idle"
+    min: 1.0
+    max: 3.5
+  per_occupied_zone_kw:
+    name: incremental HVAC load per occupied thermal zone
+    value: 0.35
+    unit: "kW"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Occupancy-driven latent and sensible load increment"
+  ambient_reference_c:
+    name: ambient reference temperature with zero incremental cooling
+    value: 22.0
+    unit: "degC"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Comfort set-point used by the load model"
+  ambient_slope_kw_per_c:
+    name: HVAC load slope per degree above reference
+    value: 0.13
+    unit: "kW/degC"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Envelope heat-gain slope for a glass-heavy cabin"
+  ambient_max_factor:
+    name: HVAC load multiplier cap versus base load
+    value: 3.5
+    unit: "-"
+    status: DESIGN_TARGET
+    source_or_rationale: "Keeps HVAC inside the 1.0-3.5 kW design band at 45 degC"
+  solar_load_kw:
+    name: solar load at full insolation
+    value: 0.45
+    unit: "kW"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Peak glass insolation gain for a high-roof cabin"
+  mode_factor:
+    name: HVAC mode factor
+    value:
+      pool: 0.85
+      commute: 0.95
+      airport: 1.10
+      intercity_premium: 1.25
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Premium modes condition the full cabin; POOL recirculates more"
+  comfort_proxy_band:
+    name: PMV-inspired comfort proxy design band
+    value: 0.5
+    unit: "PMV"
+    status: DESIGN_TARGET
+    source_or_rationale: "Design target band [-0.5,+0.5]; not a validated compliance measure"
+  comfort_temp_reference_c:
+    name: comfort proxy neutral temperature
+    value: 23.0
+    unit: "degC"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Neutral point of the proxy scale"
+  comfort_temp_sensitivity_per_c:
+    name: comfort proxy slope per degree from neutral
+    value: 0.14
+    unit: "PMV/degC"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Linearised PMV temperature slope for the proxy display"
+
+cabin_modes:
+  pool:
+    name: POOL mode id
+    value: POOL
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Shared ride, partial seat folding, max luggage of 2 large bags"
+    max_passengers: 4
+    max_luggage_units: 4
+    luggage_class_allowed: [small, large]
+  commute:
+    name: COMMUTE mode id
+    value: COMMUTE
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Daily commute, all seats up, light luggage"
+    max_passengers: 6
+    max_luggage_units: 3
+    luggage_class_allowed: [small]
+  airport:
+    name: AIRPORT mode id
+    value: AIRPORT
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Airport transfer, 4 seats up, extended luggage zone"
+    max_passengers: 4
+    max_luggage_units: 8
+    luggage_class_allowed: [small, large]
+  intercity_premium:
+    name: INTERCITY_PREMIUM mode id
+    value: INTERCITY_PREMIUM
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Long-distance premium, full recline pitch, moderate luggage"
+    max_passengers: 4
+    max_luggage_units: 5
+    luggage_class_allowed: [small, large]
+
+luggage_classes:
+  small:
+    name: small bag
+    value: small
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Hand-carriable bag"
+    volume_l: 25
+    default_mass_kg: 7.0
+    large_detection_area_m2: 0.12
+  large:
+    name: large suitcase
+    value: large
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Checked-size suitcase"
+    volume_l: 75
+    default_mass_kg: 20.0
+    large_detection_area_m2: 0.12
+
+battery:
+  chemistry:
+    name: cell chemistry
+    value: LFP
+    unit: "-"
+    status: DESIGN_TARGET
+    source_or_rationale: "LFP target for BEV pack"
+  bev_usable_energy_kwh:
+    name: NEXUS_E usable battery energy
+    value: 55.0
+    unit: "kWh"
+    status: DESIGN_TARGET
+    source_or_rationale: "Design target band 50-60 kWh"
+    min: 50.0
+    max: 60.0
+  rex_usable_energy_kwh:
+    name: NEXUS_X usable battery energy
+    value: 35.0
+    unit: "kWh"
+    status: DESIGN_TARGET
+    source_or_rationale: "Design target band 30-40 kWh"
+    min: 30.0
+    max: 40.0
+  max_charge_power_dc_kw:
+    name: DC charge acceptance limit
+    value: 110
+    unit: "kW"
+    status: DESIGN_TARGET
+    source_or_rationale: "DC fast charge target band 100-120 kW; not guaranteed charging power"
+    min: 100
+    max: 120
+  max_charge_power_ac_kw:
+    name: AC charge acceptance limit
+    value: 22
+    unit: "kW"
+    status: DESIGN_TARGET
+    source_or_rationale: "AC charging target band 11-22 kW"
+    min: 11
+    max: 22
+  taper_start_soc:
+    name: SOC where charge power begins to taper
+    value: 0.78
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "LFP-style flat curve with late taper"
+  taper_min_fraction:
+    name: minimum accepted power fraction at full SOC
+    value: 0.20
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "End-of-charge current limit representation"
+  charge_efficiency:
+    name: grid-to-battery charging efficiency
+    value: 0.93
+    unit: "-"
+    status: DESIGN_TARGET
+    source_or_rationale: "Pack and charger conversion losses"
+  discharge_efficiency_reserve:
+    name: auxiliary discharge efficiency allowance
+    value: 0.98
+    unit: "-"
+    status: MODEL_ESTIMATE
+    source_or_rationale: "Small reserve for cell-level losses outside the drivetrain path"
+  initial_soh:
+    name: initial state of health for a new vehicle
+    value: 1.0
+    unit: "-"
+    status: DESIGN_TARGET
+    source_or_rationale: "Fleet enters service at full health"
+  soh_floor:
+    name: state of health floor used by the simulation
+    value: 0.60
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Service-life end convention for the demonstrator"
+  soh_uncertainty_base:
+    name: baseline SOH estimate uncertainty
+    value: 0.02
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Spread of a model-only estimate without measured reference"
+  soh_uncertainty_per_1000_cycles:
+    name: additional SOH uncertainty per 1000 equivalent cycles
+    value: 0.015
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Estimate drift grows with accumulated cycling"
+  soh_confidence_high_max:
+    name: upper uncertainty bound for HIGH confidence label
+    value: 0.03
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Label thresholds for the battery passport"
+  soh_confidence_medium_max:
+    name: upper uncertainty bound for MEDIUM confidence label
+    value: 0.06
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Label thresholds for the battery passport"
+  thermal_time_constant_s:
+    name: battery thermal time constant
+    value: 900
+    unit: "s"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Lumped pack thermal mass response"
+  thermal_resistance_kw_per_c:
+    name: pack heat-loss coefficient per degree above ambient
+    value: 0.18
+    unit: "kW/degC"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Pack-to-ambient heat transfer representation"
+  thermal_gain_per_kw_loss:
+    name: temperature rise per kW of internal losses
+    value: 4.0
+    unit: "degC/kW"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Internal loss heating scaled to pack mass"
+  optimal_temp_c:
+    name: degradation-optimal pack temperature
+    value: 25.0
+    unit: "degC"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Reference point of the degradation temperature penalty"
+
+degradation:
+  throughput_wear_per_kwh:
+    name: baseline SOH loss per kWh throughput
+    value: 2.2e-06
+    unit: "1/kWh"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Semi-empirical calendar+cycling throughput proxy; not a validated lifetime predictor"
+  c_rate_wear_factor:
+    name: wear multiplier slope versus C-rate above 1C
+    value: 0.35
+    unit: "1/C"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "High-power throughput stresses the cell model"
+  c_rate_reference:
+    name: C-rate reference for the wear model
+    value: 1.0
+    unit: "C"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Reference current relative to usable capacity"
+  temp_wear_factor:
+    name: wear multiplier slope per degC above optimal
+    value: 0.045
+    unit: "1/degC"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Accelerated ageing above the optimal window"
+  dod_wear_factor:
+    name: wear multiplier slope versus depth of discharge above reference
+    value: 0.30
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Deeper discharge cycles carry extra stress"
+  dod_reference:
+    name: depth of discharge reference for the wear model
+    value: 0.5
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Half-depth cycle treated as neutral"
+  wear_acceleration_factor:
+    name: wear acceleration as state of health declines
+    value: 2.0
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Older packs accumulate wear faster per kWh"
+  equivalent_cycle_capacity_kwh:
+    name: capacity reference used to convert throughput to equivalent cycles
+    value: 55.0
+    unit: "kWh"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "One equivalent cycle equals one full usable-capacity throughput"
+
+range_extender:
+  generator_usable_output_kw:
+    name: simulated range-extender generator output
+    value: 35
+    unit: "kW"
+    status: DESIGN_TARGET
+    source_or_rationale: "Sustained onboard generation level for NEXUS_X"
+  generator_efficiency:
+    name: generator set efficiency from fuel to battery
+    value: 0.34
+    unit: "-"
+    status: DESIGN_TARGET
+    source_or_rationale: "Small genset conversion efficiency band"
+  generator_maintenance_inr_per_hour:
+    name: generator maintenance reserve
+    value: 42.0
+    unit: "INR/h"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Service interval cost spread over running hours"
+  generator_fuel_price_inr_per_litre:
+    name: generator fuel price
+    value: 94.0
+    unit: "INR/l"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Pump-price diesel assumption for the economics case"
+  generator_fuel_energy_kwh_per_litre:
+    name: fuel energy per litre consumed by the generator set
+    value: 10.0
+    unit: "kWh/l"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Lower heating value representation of diesel fuel used by the simulated genset"
+
+numerics:
+  integration_dt_s:
+    name: fixed integration step of the route-energy model
+    value: 1.0
+    unit: "s"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Fixed-step Euler integration documented in the model notes"
+    max: 5.0
+
+mixed_use_range_km:
+  name: mixed-use range target band midpoint
+  value: 300
+  unit: "km"
+  status: DESIGN_TARGET
+  source_or_rationale: "Target band 280-320 km; demonstrator reports its own model-derived range"
+  min: 280
+  max: 320
+
+ambient_operating_max_c:
+  name: maximum ambient operating scenario temperature
+  value: 45
+  unit: "degC"
+  status: DESIGN_TARGET
+  source_or_rationale: "Simulation target for hot-climate duty"

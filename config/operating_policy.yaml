@@ -1,0 +1,283 @@
+# Operating policy: dispatch thresholds, camera/vision policy, service rules,
+# and state-integrity settings. Leaf format matches config/vehicle.yaml.
+
+version: "1.0.0"
+
+soc_policy:
+  soc_operating_min:
+    name: normal SOC operating band lower bound
+    value: 0.10
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Operating band target 10%; longevity policy, not a hard floor"
+    max: 0.30
+  soc_operating_max:
+    name: normal SOC operating band upper bound
+    value: 0.90
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Operating band target 90%; longevity policy, not a hard cap"
+    min: 0.70
+  soc_reserve_min:
+    name: minimum dispatch/arrival SOC reserve
+    value: 0.15
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Dispatch reserve target 15%; the binding feasibility threshold"
+    min: 0.05
+    max: 0.40
+  reserve_rule:
+    name: feasibility reserve rule
+    value: max_of_reserve_and_operating_min
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Feasibility uses the stronger of reserve and operating minimum"
+  dashboard_threshold_note:
+    name: dashboard threshold disclosure
+    value: decision_payload_reports_reserve_soc_pct
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "UI must show which configured threshold was applied"
+
+service:
+  pickup_window_s:
+    name: default pickup time window
+    value: 300
+    unit: "s"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Shared-mobility pickup tolerance used by feasibility checks"
+  average_service_time_s:
+    name: average passenger service time at pickup
+    value: 90
+    unit: "s"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Boarding/alighting allowance in scheduling math"
+  charger_plug_service_time_s:
+    name: average charging session duration at a plug
+    value: 1320
+    unit: "s"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "22 minutes mean plug occupancy used for queue estimation"
+  deadhead_speed_factor:
+    name: empty-repositioning speed factor versus posted edge speed
+    value: 0.95
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Slightly conservative empty-run travel assumption"
+  availability_recovery_s:
+    name: simulated turnaround time before a vehicle is free again
+    value: 300
+    unit: "s"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Passenger drop-off and preparation time in the simulation"
+
+traffic:
+  base_speed_source:
+    name: edge speed source
+    value: edge_free_flow_speed_modified_by_traffic_factor
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Deterministic speed approximation documented in the model notes"
+  min_speed_factor:
+    name: minimum speed multiplier under heavy traffic
+    value: 0.35
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Gridlock floor for the speed approximation"
+  traffic_sensitivity_reference:
+    name: traffic factor at which edge speed equals free flow
+    value: 1.0
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Traffic factor is a multiplier on free-flow speed inverse"
+
+vision:
+  confidence_threshold:
+    name: minimum aggregate confidence to accept a cabin reading
+    value: 0.65
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Below this the pipeline keeps the previous state"
+  min_frames_for_reading:
+    name: frames aggregated per cabin reading
+    value: 5
+    unit: "frames"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Multi-frame aggregation window"
+  debounce_window_s:
+    name: minimum time between cabin state emissions
+    value: 2.0
+    unit: "s"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Prevents mode flapping on single-frame detector changes"
+  state_retention_s:
+    name: how long the last valid reading is trusted without new evidence
+    value: 30
+    unit: "s"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Stale-reading cutoff before manual confirmation is requested"
+  mode_proposal_confidence:
+    name: minimum confidence to propose an automatic mode change
+    value: 0.75
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Proposals need stronger evidence than state updates"
+  airport_proposal_large_luggage:
+    name: large-luggage count that proposes AIRPORT mode
+    value: 2
+    unit: "bags"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "A high luggage count proposes AIRPORT; it never commands it"
+  frame_retention_policy:
+    name: raw frame handling policy
+    value: in_memory_only_discard_after_inference
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "No video frames or identity-bearing images are persisted"
+  camera_source:
+    name: frame source used by the cabin pipeline
+    value: prerecorded
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "prerecorded sample frames or a local camera device"
+    allowed: [prerecorded, local]
+  camera_device_index:
+    name: local camera device index
+    value: 0
+    unit: "index"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Webcam index when camera_source is local"
+  prerecorded_frames_path:
+    name: directory of prerecorded sample frames
+    value: data/vision/eval_set
+    unit: "path"
+    status: MEASURED_LOCAL
+    source_or_rationale: "Open-licensed sample frames standing in for a cabin camera during demos"
+  seat_regions:
+    name: calibrated seat-region mapping (normalized [x1,y1,x2,y2] per region)
+    value: []
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "No fixed camera calibration is configured, so region mapping stays disabled rather than guessed"
+  detection_input_size_px:
+    name: detector input resolution
+    value: 640
+    unit: "px"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Detector operating point; 640 px materially improves small-object recall in the labeled evaluation"
+  detection_score_threshold:
+    name: per-detection score threshold
+    value: 0.25
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Per-frame detector gate before aggregation, tuned for recall on the labeled evaluation"
+  empty_frame_confidence:
+    name: aggregate confidence assigned to a frame with no detections
+    value: 0.5
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "An empty frame cannot separate an empty cabin from missed detections, so it carries neutral confidence"
+  model_arch:
+    name: local detector architecture
+    value: yolov8s
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Lightweight COCO-pretrained PyTorch detector running fully local; the small variant measurably beats the nano variant on the labeled evaluation"
+  model_weights_path:
+    name: detector weights file inside the repository
+    value: data/models/yolov8s.pt
+    unit: "path"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Weights are stored locally; nothing is downloaded at runtime"
+  model_weights_sha256:
+    name: sha256 of the detector weights file
+    value: 1f47a78bf100391c2a140b7ac73a1caae18c32779be7d310658112f7ac9aa78a
+    unit: "hex"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Integrity check recorded when the weights were imported"
+  coco_category_map:
+    name: detector category mapping to cabin quantities
+    value:
+      person: person
+      backpack: small
+      handbag: small
+      suitcase: large
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "COCO categories mapped to person counts and luggage classes"
+  eval_set_path:
+    name: labeled evaluation set directory
+    value: data/vision/eval_set
+    unit: "path"
+    status: MEASURED_LOCAL
+    source_or_rationale: "Controlled labeled set built from open-licensed COCO val images with a labels.json manifest"
+  eval_iou_threshold:
+    name: IoU threshold for matching detections to ground truth
+    value: 0.5
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Standard matching threshold for detection precision/recall"
+  maintenance_model_path:
+    name: maintenance cue classifier weights file
+    value: data/models/maintenance_cue_cnn.pt
+    unit: "path"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Locally trained demonstrator classifier; see the training script in experiments/tools"
+  maintenance_input_px:
+    name: maintenance classifier input resolution
+    value: 64
+    unit: "px"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Grayscale square input of the cue classifier"
+  maintenance_uncertain_below:
+    name: confidence below which the cue classifier reports 'uncertain'
+    value: 0.55
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Low-confidence outputs degrade to 'uncertain' instead of a cue label"
+  maintenance_disclaimer:
+    name: displayed disclaimer of the maintenance cue output
+    value: "Visual cue indicator only - not a formal vehicle inspection or roadworthiness assessment."
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "The demonstrator must never imply a safety judgement"
+
+state_integrity:
+  stale_after_s:
+    name: age after which a recommendation is marked stale
+    value: 120
+    unit: "s"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Display continuity rule for lost upstream updates"
+  ws_snapshot_on_connect:
+    name: websocket behaviour on connect
+    value: full_snapshot_then_deltas
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Reconnects always resynchronise from a snapshot"
+  operator_token_env:
+    name: environment variable holding the optional operator token
+    value: NEXUS7_OPERATOR_TOKEN
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Local permission gate for state-changing endpoints"
+
+evidence:
+  default_model_status:
+    name: evidence label used for model outputs before calibration
+    value: MODEL_ESTIMATE
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Model outputs are estimates until calibrated against measurements"
+  calibration_flag:
+    name: calibration status of the vehicle model
+    value: UNCALIBRATED
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "No measured vehicle data has been used for calibration"
+  display_phrase:
+    name: display phrase for uncalibrated model outputs
+    value: "simulation estimate - not vehicle-calibrated"
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Shown next to headline model numbers in the UI"

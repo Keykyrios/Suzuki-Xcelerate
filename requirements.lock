@@ -1,0 +1,19 @@
+# Pinned direct dependencies for the backend (Python 3.11/3.13).
+# torch/torchvision are expected from the host CUDA/CPU install; any build of
+# these exact versions satisfies the runtime.
+fastapi==0.116.2
+starlette==0.48.0
+uvicorn==0.35.0
+pydantic==2.11.9
+numpy==2.4.4
+scipy==1.16.2
+ortools==9.14.6206
+duckdb==1.4.2
+pyarrow==25.0.1
+pyyaml==6.0.2
+httpx==0.28.1
+websockets==10.4
+opencv-python==4.13.0.92
+torch==2.12.1
+torchvision==0.27.1
+pytest==9.0.2

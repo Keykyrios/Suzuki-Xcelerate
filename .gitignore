@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+.pytest_cache/
+
+# Node
+node_modules/
+frontend/dist/
+
+# Runtime outputs
+data/processed/
+data/manifests/
+experiments/results/*.parquet
+!data/processed/.gitkeep
+!experiments/results/.gitkeep
+
+# Env and OS
+.env
+.DS_Store
+data/raw/
+
+# AI tool artifacts
+.freebuff/
+.gemini/
+.cursor/
+.aider*
+.copilot/
+.codeium/
+.windsurf/
+.continue/
+.tabnine/

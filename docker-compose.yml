@@ -1,0 +1,35 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: nexus7-api:1.0.0
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      NEXUS7_HOST: 0.0.0.0
+      NEXUS7_PORT: 8000
+      NEXUS7_VISION_SOURCE: ${NEXUS7_VISION_SOURCE:-off}
+      NEXUS7_OPERATOR_TOKEN: ${NEXUS7_OPERATOR_TOKEN:-}
+    volumes:
+      - ./data:/app/data
+      - ./config:/app/config
+    # No privileged devices, no vehicle interfaces: the container only runs the
+    # simulation API. Camera access (optional) is opt-in via device mapping.
+    # devices: []
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/api/health').status==200 else 1)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: nexus7-frontend:1.0.0
+    ports:
+      - "127.0.0.1:5173:80"
+    depends_on:
+      api:
+        condition: service_healthy

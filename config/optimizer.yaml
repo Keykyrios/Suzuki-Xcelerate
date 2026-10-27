@@ -1,0 +1,280 @@
+# Optimizer, charging-schedule, risk, and solver configuration.
+
+version: "1.0.0"
+
+solver:
+  primary:
+    name: primary solver adapter id
+    value: ortools_milp
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "OR-Tools MILP (SCIP/CBC) is the default adapter"
+  fallback:
+    name: fallback solver adapter id
+    value: scipy_milp
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "HiGHS through SciPy keeps the adapter replaceable without a hard dependency"
+  timeout_s:
+    name: solver wall-clock timeout
+    value: 15
+    unit: "s"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Interactive demo responsiveness bound"
+  mip_relative_gap:
+    name: MIP relative optimality gap
+    value: 0.001
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Practical optimality tolerance for the assignment scale"
+  on_failure:
+    name: solver failure policy
+    value: fall_back_to_baseline
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Timeout or error returns the transparent baseline with a truthful status"
+    allowed: [fall_back_to_baseline, report_no_feasible_plan]
+  candidate_dt_s:
+    name: integration step used for optimizer candidate screening
+    value: 5.0
+    unit: "s"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Coarser than the display physics step so scenario batches solve interactively; accepted plans are re-simulated at the configured display step before display"
+    max: 5.0
+
+objective:
+  currency:
+    name: objective currency
+    value: INR_2026_constant
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Constant 2026 rupees throughout the economics case"
+  normalize_to_currency:
+    name: cost normalization strategy
+    value: all_terms_monetary_inr
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Distance, time, energy and risk terms convert to INR via configured weights"
+
+dispatch_weights:
+  pickup_time_inr_per_min:
+    name: monetary weight of passenger pickup time
+    value: 2.5
+    unit: "INR/min"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Service-quality price of a minute of passenger waiting"
+  deadhead_inr_per_km:
+    name: cost of empty kilometres
+    value: 7.0
+    unit: "INR/km"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Energy plus wear plus driver time on non-revenue legs"
+  late_pickup_penalty_inr:
+    name: penalty charged when a pickup misses its window
+    value: 120.0
+    unit: "INR"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Expected cancellation/service-failure cost per late pickup"
+  unserved_penalty_inr:
+    name: penalty for leaving a request unserved
+    value: 250.0
+    unit: "INR"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Opportunity cost of unmet demand in the horizon"
+  energy_inr_per_kwh:
+    name: energy price used inside the assignment cost
+    value: 9.2
+    unit: "INR/kWh"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Blended charging tariff; economics view uses full time-of-use curves"
+  service_time_weight_inr_per_min:
+    name: monetary weight of onboard trip time
+    value: 0.8
+    unit: "INR/min"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Marginal cost of occupied vehicle time beyond direct energy/wear"
+
+risk:
+  enabled:
+    name: risk-aware objective switch
+    value: true
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "CVaR term active in the challenger objective"
+  alpha:
+    name: CVaR confidence level
+    value: 0.95
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Default tail confidence level"
+  lambda:
+    name: CVaR penalty weight (INR of objective value per INR of CVaR loss)
+    value: 0.35
+    unit: "INR/INR"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Risk aversion dial; scales tail loss into objective units"
+  loss_definition:
+    name: loss convention
+    value: loss_equals_negative_profit
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Consistent loss convention across the implementation"
+  scenario_batch_size:
+    name: scenarios drawn for the risk objective
+    value: 24
+    unit: "scenarios"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Discrete scenario set for the CVaR auxiliary formulation"
+  uncertainty_traffic_sigma:
+    name: traffic factor sigma used to build risk scenarios
+    value: 0.25
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Travel-time variation family"
+  uncertainty_demand_sigma:
+    name: demand multiplier sigma used to build risk scenarios
+    value: 0.30
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Demand volume variation family"
+
+charging:
+  day_ahead_slot_minutes:
+    name: day-ahead schedule slot length
+    value: 15
+    unit: "min"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "24 h horizon in 15-minute slots"
+    allowed: [15]
+  day_ahead_horizon_h:
+    name: day-ahead schedule horizon
+    value: 24
+    unit: "h"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Full operating day"
+  rolling_lookahead_min:
+    name: rolling correction look-ahead
+    value: 75
+    unit: "min"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "60-90 minute window"
+    min: 60
+    max: 90
+  rolling_update_interval_min:
+    name: rolling correction update interval
+    value: 10
+    unit: "min"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "5-15 minute cadence"
+    min: 5
+    max: 15
+  mission_uncertainty_reserve:
+    name: fractional energy reserve on top of the next mission
+    value: 0.12
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Targets only next-mission energy plus reserve, not 100%"
+  max_target_soc:
+    name: maximum SOC the scheduler will charge toward
+    value: 0.90
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Never targets 100% by default; respects the operating band"
+  queue_cost_inr_per_min:
+    name: cost of queue minutes
+    value: 3.0
+    unit: "INR/min"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Driver/opportunity cost of waiting at a charger"
+  detour_cost_inr_per_km:
+    name: cost of detour kilometres
+    value: 6.5
+    unit: "INR/km"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Incremental operating cost of charger detours"
+  lost_productive_revenue_inr_per_min:
+    name: productive revenue lost per charging minute
+    value: 2.2
+    unit: "INR/min"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Fare margin forgone while plugged in"
+  site_power_allocation_rule:
+    name: site power split across active plugs
+    value: equal_split_with_per_vehicle_cap
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Simultaneous sessions share the site/grid limit"
+
+repositioning:
+  enabled:
+    name: proactive repositioning switch for the challenger
+    value: true
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Baseline never repositions; the challenger may"
+  forecast_horizon_min:
+    name: demand forecast horizon for repositioning
+    value: 15
+    unit: "min"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Next-interval demand estimate"
+  benefit_margin_threshold:
+    name: minimum expected benefit ratio versus deadhead cost
+    value: 1.5
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Move only when benefit clearly exceeds deadhead energy, time, cost and risk"
+  max_deadhead_km:
+    name: maximum empty repositioning distance
+    value: 4.0
+    unit: "km"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Keeps empty running bounded"
+  unserved_risk_inr_per_request:
+    name: expected margin lost per unserved request in a zone
+    value: 180.0
+    unit: "INR"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Value of avoided unserved demand used in the benefit estimate"
+
+powertrain:
+  rex_capital_allocation_inr_per_day:
+    name: daily capital allocation for the range-extender configuration
+    value: 410.0
+    unit: "INR/day"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Configured cost allocation difference between NEXUS_X and NEXUS_E"
+  rex_maintenance_delta_inr_per_km:
+    name: extra maintenance per km for the range-extender configuration
+    value: 1.4
+    unit: "INR/km"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Genset service reserve difference"
+  bev_charging_risk_inr_per_mission:
+    name: expected service-failure risk cost of charging-dependent missions
+    value: 140.0
+    unit: "INR/mission"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Charging-infrastructure exposure priced per mission"
+  service_failure_probability_when_no_charger:
+    name: failure probability of a charging-dependent mission with no reachable charger
+    value: 0.5
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Exposes the mission fare at risk when no charger can cover the energy deficit; drives the infrastructure-limited NEXUS_X recommendation"
+  recommendation_confidence_margin:
+    name: cost gap required before switching the recommendation
+    value: 0.05
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Relative gap that must be exceeded to prefer NEXUS_X"
+
+benchmark:
+  default_batch_size:
+    name: default scenario batch for experiments
+    value: 64
+    unit: "scenarios"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Initial implementation setting inside the 50-100 guidance"
+    min: 50
+    max: 100

@@ -1,0 +1,583 @@
+# Scenario seeds, uncertainty families, fault-injection catalog, and the
+# scripted demonstration sequence.
+
+version: "1.0.0"
+
+seeds:
+  master_seed:
+    name: master seed for the starter world
+    value: 42
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Deterministic starter graph, chargers, requests and fleet"
+  regression_seeds:
+    name: fixed seeds used by deterministic regression cases
+    value: [42, 7, 123]
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Repeatable regression set"
+  robustness_seeds:
+    name: independent seeds used for robustness checks
+    value: [101, 202, 303, 404, 505]
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Held-out seeds that regression never uses"
+
+world:
+  zones:
+    name: number of service zones
+    value: 12
+    unit: "zones"
+    status: SYNTHETIC
+    source_or_rationale: "Prototype service graph fixture"
+  vehicles:
+    name: simulated vehicles
+    value: 10
+    unit: "vehicles"
+    status: SYNTHETIC
+    source_or_rationale: "Prototype fleet size"
+  chargers:
+    name: charging nodes
+    value: 3
+    unit: "chargers"
+    status: SYNTHETIC
+    source_or_rationale: "Prototype charging network"
+  demand_records:
+    name: historical-style demand records
+    value: 50
+    unit: "records"
+    status: SYNTHETIC
+    source_or_rationale: "Prototype demand history, not observed city demand"
+  city_extent_m:
+    name: schematic city half-extent used for coordinate generation
+    value: 6000
+    unit: "m"
+    status: SYNTHETIC
+    source_or_rationale: "Schematic map coordinates in a local metric frame"
+  intercity_corridor_length_km:
+    name: intercity corridor length
+    value: 96
+    unit: "km"
+    status: SYNTHETIC
+    source_or_rationale: "Corridor with two intermediate nodes"
+  airport_edge_length_km:
+    name: airport connector length
+    value: 14
+    unit: "km"
+    status: SYNTHETIC
+    source_or_rationale: "Airport node sits outside the urban core"
+  baseline_speed_m_s:
+    name: reference urban free-flow speed
+    value: 11.1
+    unit: "m/s"
+    status: SYNTHETIC
+    source_or_rationale: "About 40 km/h urban reference; edges vary ±25%"
+
+demand:
+  daily_requests_mean:
+    name: mean requests per day
+    value: 120
+    unit: "requests"
+    status: SYNTHETIC
+    source_or_rationale: "Prototype demand volume"
+  negative_binomial_dispersion:
+    name: Negative Binomial dispersion (alpha)
+    value: 6.0
+    unit: "-"
+    status: SYNTHETIC
+    source_or_rationale: "Overdispersion for request counts; starter data cannot support a generalizable forecast"
+  time_of_day_peaks:
+    name: relative demand multipliers by hour
+    value: [0.2, 0.15, 0.1, 0.1, 0.2, 0.5, 1.2, 1.8, 1.6, 1.1, 1.0, 1.1, 1.3, 1.1, 1.0, 1.1, 1.5, 1.9, 1.7, 1.3, 1.0, 0.8, 0.5, 0.3]
+    unit: "-"
+    status: SYNTHETIC
+    source_or_rationale: "Diurnal shape used by the demand generator"
+  day_type_multipliers:
+    name: day-type demand multiplier
+    value:
+      weekday: 1.0
+      saturday: 0.85
+      sunday: 0.7
+    unit: "-"
+    status: SYNTHETIC
+    source_or_rationale: "Day-type shaping"
+  service_type_weights:
+    name: service-type mix
+    value:
+      pool: 0.45
+      commute: 0.30
+      airport: 0.15
+      intercity_premium: 0.10
+    unit: "-"
+    status: SYNTHETIC
+    source_or_rationale: "Service mix of the prototype demand"
+  day_type_weights:
+    name: relative frequency of each day type in generated history
+    value:
+      weekday: 0.6
+      saturday: 0.2
+      sunday: 0.2
+    unit: "-"
+    status: SYNTHETIC
+    source_or_rationale: "Day-type sampling weights for the synthetic history"
+  od_beta_per_km:
+    name: distance-decay coefficient of the destination choice model
+    value: 0.06
+    unit: "1/km"
+    status: SYNTHETIC
+    source_or_rationale: "Gravity-style destination preference: closer zones are likelier"
+  airport_attraction_weight:
+    name: relative attraction of the airport node for airport-class demand
+    value: 6.0
+    unit: "-"
+    status: SYNTHETIC
+    source_or_rationale: "Airport trips are concentrated on the airport node"
+  intercity_attraction_weight:
+    name: relative attraction of corridor zones for intercity demand
+    value: 4.0
+    unit: "-"
+    status: SYNTHETIC
+    source_or_rationale: "Intercity trips concentrate on corridor gateways"
+  od_reconstruction_beta_per_km:
+    name: distance-decay coefficient used by the entropy-regularized OD solver
+    value: 0.05
+    unit: "1/km"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Prior structure for reconstructed flows; flows are labelled RECONSTRUCTED"
+  od_reconstruction_max_iterations:
+    name: maximum scaling iterations of the OD solver
+    value: 500
+    unit: "iterations"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Convergence bound of the iterative proportional scaling"
+  od_reconstruction_tolerance:
+    name: marginal residual tolerance of the OD solver
+    value: 1e-09
+    unit: "trips"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Convergence criterion on row/column marginals"
+  zone_attraction_smoothing:
+    name: smoothing constant for zone attraction shares
+    value: 1.0
+    unit: "records"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Keeps zone shares defined when a zone has no history"
+  forecast_confidence_floor:
+    name: minimum forecast confidence label value
+    value: 0.30
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Confidence never claims more than the history supports"
+
+uncertainty_families:
+  demand_volume_sigma:
+    name: demand volume relative sigma
+    value: 0.35
+    unit: "-"
+    status: SYNTHETIC
+    source_or_rationale: "Family 1: demand volume and spatial/time distribution"
+  travel_time_sigma:
+    name: travel-time variation sigma
+    value: 0.25
+    unit: "-"
+    status: SYNTHETIC
+    source_or_rationale: "Family 2: traffic and travel-time variation"
+  charger_outage_probability:
+    name: per-charger outage probability in generated scenarios
+    value: 0.12
+    unit: "-"
+    status: SYNTHETIC
+    source_or_rationale: "Family 3: charger online/offline state and queues"
+  charger_queue_sigma:
+    name: charger queue length sigma
+    value: 1.0
+    unit: "-"
+    status: SYNTHETIC
+    source_or_rationale: "Family 3: queue variation"
+  ambient_temp_range_c:
+    name: ambient temperature range in generated scenarios
+    value: [25.0, 45.0]
+    unit: "degC"
+    status: SYNTHETIC
+    source_or_rationale: "Family 4: ambient temperature and HVAC load"
+  fleet_soh_range:
+    name: fleet SOH range in generated scenarios
+    value: [0.72, 1.0]
+    unit: "-"
+    status: SYNTHETIC
+    source_or_rationale: "Family 5: fleet battery SOH distribution"
+
+fault_injections:
+  charger_offline:
+    name: charger offline fault
+    value: "OFFLINE"
+    unit: "-"
+    status: SYNTHETIC
+    source_or_rationale: "Simulated grid/asset outage at a named charger node"
+    target: charger
+    parameter: status
+  traffic_spike:
+    name: traffic spike fault
+    value: 1.9
+    unit: "traffic_factor"
+    status: SYNTHETIC
+    source_or_rationale: "Sudden travel-time inflation across the network"
+    target: scenario
+    parameter: traffic_factor
+  heat_wave:
+    name: heat wave fault
+    value: 45.0
+    unit: "degC"
+    status: SYNTHETIC
+    source_or_rationale: "Peak cooling demand conditions"
+    target: scenario
+    parameter: ambient_temp_c
+  low_soh_vehicle:
+    name: degraded vehicle fault
+    value: 0.74
+    unit: "-"
+    status: SYNTHETIC
+    source_or_rationale: "Marks a vehicle with reduced state of health"
+    target: vehicle
+    parameter: soh
+  demand_surge:
+    name: demand surge fault
+    value: 2.1
+    unit: "-"
+    status: SYNTHETIC
+    source_or_rationale: "Request volume above the normal band"
+    target: scenario
+    parameter: demand_multiplier
+
+layout:
+  zone_prefix:
+    name: service-zone id prefix
+    value: "Z"
+    unit: "-"
+    status: SYNTHETIC
+    source_or_rationale: "Zone ids are Z01..Znn on the schematic grid"
+  zone_columns:
+    name: columns in the schematic zone grid
+    value: 4
+    unit: "cells"
+    status: SYNTHETIC
+    source_or_rationale: "12 urban zones laid out as a 4x3 grid inside the city extent"
+  zone_spacing_m:
+    name: spacing between adjacent grid zones
+    value: 1800
+    unit: "m"
+    status: SYNTHETIC
+    source_or_rationale: "Schematic urban spacing consistent with a 6 km half-extent"
+  road_detour_factor:
+    name: road distance factor over straight-line distance
+    value: 1.15
+    unit: "-"
+    status: SYNTHETIC
+    source_or_rationale: "Street-network detour applied to schematic edge lengths"
+  edge_speed_variation:
+    name: free-flow speed variation around the reference speed
+    value: 0.25
+    unit: "-"
+    status: SYNTHETIC
+    source_or_rationale: "Edge speeds vary +/-25% around the reference urban speed"
+  edge_traffic_sensitivity_urban:
+    name: traffic sensitivity of urban edges
+    value: 0.6
+    unit: "-"
+    status: SYNTHETIC
+    source_or_rationale: "Urban edges slow down strongly under traffic inflation"
+  edge_traffic_sensitivity_connector:
+    name: traffic sensitivity of airport and corridor edges
+    value: 0.35
+    unit: "-"
+    status: SYNTHETIC
+    source_or_rationale: "Grade-separated connectors are less traffic-sensitive"
+  grade_segments_per_edge:
+    name: grade profile segments per edge
+    value: 3
+    unit: "segments"
+    status: SYNTHETIC
+    source_or_rationale: "Piecewise-constant grade profile resolution"
+  grade_min_percent:
+    name: minimum generated edge grade
+    value: -1.5
+    unit: "%"
+    status: SYNTHETIC
+    source_or_rationale: "Schematic terrain band for the starter graph"
+  grade_max_percent:
+    name: maximum generated edge grade
+    value: 1.5
+    unit: "%"
+    status: SYNTHETIC
+    source_or_rationale: "Schematic terrain band for the starter graph"
+  airport_connector_zone:
+    name: urban zone linked to the airport node
+    value: Z04
+    unit: "-"
+    status: SYNTHETIC
+    source_or_rationale: "Airport pickup/drop-off gateway zone of the starter graph"
+  airport_node_id:
+    name: airport graph node id
+    value: AIRPORT
+    unit: "-"
+    status: SYNTHETIC
+    source_or_rationale: "Single airport node"
+  corridor_entry_zone:
+    name: urban zone where the intercity corridor leaves the city
+    value: Z01
+    unit: "-"
+    status: SYNTHETIC
+    source_or_rationale: "Corridor gateway zone"
+  corridor_node_ids:
+    name: intermediate corridor node ids
+    value: [CORRIDOR_WEST, CORRIDOR_EAST]
+    unit: "-"
+    status: SYNTHETIC
+    source_or_rationale: "Two intermediate nodes along the 96 km corridor"
+  corridor_terminus_id:
+    name: eastern terminus of the intercity corridor
+    value: TERMINUS_EAST
+    unit: "-"
+    status: SYNTHETIC
+    source_or_rationale: "Eastern end of the corridor; three equal segments between gateway and terminus"
+  corridor_toll_inr:
+    name: corridor toll per traversal
+    value: 45
+    unit: "INR"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Indicative corridor toll used in cost estimates"
+  connector_speed_kmh:
+    name: free-flow speed of airport and corridor connectors
+    value: 72.0
+    unit: "km/h"
+    status: SYNTHETIC
+    source_or_rationale: "Grade-separated connectors run at arterial speed"
+  focus_initial_zone:
+    name: starting zone of the demonstration focus vehicle
+    value: Z04
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Focus vehicle starts near the airport gateway"
+
+fleet:
+  id_prefix:
+    name: vehicle id prefix
+    value: NX-
+    unit: "-"
+    status: SYNTHETIC
+    source_or_rationale: "Fleet ids are NX-01..NX-10"
+  nexus_e_count:
+    name: battery-electric vehicles in the starter fleet
+    value: 7
+    unit: "vehicles"
+    status: SYNTHETIC
+    source_or_rationale: "BEV-majority fleet composition"
+  nexus_x_count:
+    name: range-extender vehicles in the starter fleet
+    value: 3
+    unit: "vehicles"
+    status: SYNTHETIC
+    source_or_rationale: "Range-extender minority for powertrain comparison"
+  initial_soc_min:
+    name: minimum starting SOC of the fleet
+    value: 0.55
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Fleet enters the horizon inside the operating band"
+  initial_soc_max:
+    name: maximum starting SOC of the fleet
+    value: 0.90
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Fleet enters the horizon at or below the operating maximum"
+  odometer_start_km:
+    name: odometer reading assigned to a new fleet vehicle
+    value: 12500
+    unit: "km"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Early-service odometer starting point for the demonstrator"
+  charge_limit_soc:
+    name: default charge limit applied to fleet vehicles
+    value: 0.90
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Charge limit follows the configured operating maximum"
+  battery_temp_initial_c:
+    name: battery temperature at fleet creation
+    value: 25.0
+    unit: "degC"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Pack starts at the degradation-optimal temperature"
+
+charger_sites:
+  CH-01:
+    name: charging site CH-01
+    value: CH-01
+    unit: "-"
+    status: SYNTHETIC
+    source_or_rationale: "Public DC hub on the urban ring"
+    node_zone: Z02
+    rated_power_kw: 110.0
+    site_limit_kw: 165.0
+    plug_count: 2
+    connectors: [CCS2]
+  CH-02:
+    name: charging site CH-02
+    value: CH-02
+    unit: "-"
+    status: SYNTHETIC
+    source_or_rationale: "Mid-power site targeted by the outage demonstration"
+    node_zone: Z06
+    rated_power_kw: 60.0
+    site_limit_kw: 120.0
+    plug_count: 2
+    connectors: [CCS2]
+  CH-03:
+    name: charging site CH-03
+    value: CH-03
+    unit: "-"
+    status: SYNTHETIC
+    source_or_rationale: "Airport-gateway fast hub with the largest site limit"
+    node_zone: Z04
+    rated_power_kw: 110.0
+    site_limit_kw: 220.0
+    plug_count: 3
+    connectors: [CCS2]
+  initial_queue_max:
+    name: maximum seeded initial queue length per site
+    value: 2
+    unit: "vehicles"
+    status: SYNTHETIC
+    source_or_rationale: "Starter queues are short and reproducible from the seed"
+
+world_defaults:
+  ambient_temp_c:
+    name: default scenario ambient temperature
+    value: 30.0
+    unit: "degC"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Warm-day baseline inside the 25-45 degC demo band"
+  traffic_factor:
+    name: default scenario traffic factor
+    value: 1.2
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Mild congestion baseline"
+  active_requests:
+    name: trip requests instantiated in the starter horizon
+    value: 12
+    unit: "requests"
+    status: SYNTHETIC
+    source_or_rationale: "Requests active at scenario start, drawn from the demand model"
+  request_time_span_s:
+    name: spread of request times across the starter horizon
+    value: 3600
+    unit: "s"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "One hour of request arrivals at scenario start"
+  horizon_start_hour:
+    name: hour of day at scenario start
+    value: 8
+    unit: "h"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Morning peak start for the demonstration"
+
+request_defaults:
+  passengers_min:
+    name: minimum passengers on a generated request
+    value: 1
+    unit: "passengers"
+    status: SYNTHETIC
+    source_or_rationale: "Every request carries at least one passenger"
+  passengers_max:
+    name: maximum passengers on a generated request
+    value: 4
+    unit: "passengers"
+    status: SYNTHETIC
+    source_or_rationale: "Shared-mobility request size ceiling below full capacity"
+  luggage_probability:
+    name: probability that a request carries luggage
+    value: 0.5
+    unit: "-"
+    status: SYNTHETIC
+    source_or_rationale: "Half of generated requests include bags"
+  luggage_units_max:
+    name: maximum luggage units on a generated request
+    value: 3
+    unit: "bags"
+    status: SYNTHETIC
+    source_or_rationale: "Request luggage ceiling inside mode limits"
+  large_luggage_share:
+    name: share of large bags among a request's luggage
+    value: 0.4
+    unit: "-"
+    status: SYNTHETIC
+    source_or_rationale: "Mix of small bags and large suitcases"
+
+demo_script:
+  scenario_id:
+    name: scripted demonstration scenario id
+    value: airport_heat_charger_outage_01
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Deterministic resettable demonstration sequence"
+  initial_cabin_mode:
+    name: cabin mode at demo start
+    value: POOL
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Step 1 of the demonstration sequence"
+  focus_vehicle_id:
+    name: vehicle used by the demonstration sequence
+    value: NX-03
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Focal vehicle of the scripted flow"
+  initial_soc:
+    name: initial SOC of the focal vehicle
+    value: 0.72
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Starting state of the demonstration"
+  target_passengers:
+    name: passenger count used by the camera/manual step
+    value: 4
+    unit: "passengers"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Step 2 of the demonstration sequence"
+  target_luggage_units:
+    name: luggage units used by the camera/manual step
+    value: 3
+    unit: "bags"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Step 2 of the demonstration sequence"
+  target_luggage_mass_kg:
+    name: luggage mass used by the camera/manual step
+    value: 55
+    unit: "kg"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Step 2 of the demonstration sequence"
+  outage_charger_id:
+    name: charger taken offline during the demonstration
+    value: CH-02
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Step 6 of the demonstration sequence"
+  hot_ambient_c:
+    name: ambient temperature raised mid-demonstration
+    value: 45.0
+    unit: "degC"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Step 9 of the demonstration sequence"
+  intercity_origin_zone:
+    name: intercity mission origin zone
+    value: Z01
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Step 10 of the demonstration sequence"
+  intercity_destination_zone:
+    name: intercity mission destination zone
+    value: CORRIDOR_EAST
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Step 10 of the demonstration sequence"

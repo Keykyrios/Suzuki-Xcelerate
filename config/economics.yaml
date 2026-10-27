@@ -1,0 +1,216 @@
+# Operating economics: fares, tariffs, cost structure, and the reference case.
+# All monetary values are constant 2026 INR. Figures from the concept business
+# case are stored as reference-case assumptions and reproduced as scenario
+# outputs, never as guaranteed results.
+
+version: "1.0.0"
+
+currency:
+  code:
+    name: currency
+    value: INR
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Constant 2026 rupees for the reference economics case"
+  base_year:
+    name: price base year
+    value: 2026
+    unit: "year"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Constant-rupee basis"
+
+fares:
+  pool_inr_per_pax_km:
+    name: POOL fare per passenger kilometre
+    value: 9.0
+    unit: "INR/(pax*km)"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Shared-ride reference fare"
+  commute_inr_per_pax_km:
+    name: COMMUTE fare per passenger kilometre
+    value: 14.0
+    unit: "INR/(pax*km)"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Commuter reference fare"
+  airport_inr_per_pax_km:
+    name: AIRPORT fare per passenger kilometre
+    value: 18.0
+    unit: "INR/(pax*km)"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Airport transfer reference fare"
+  airport_fixed_inr:
+    name: AIRPORT flat pickup component
+    value: 90.0
+    unit: "INR"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Flat airport pickup component"
+  intercity_premium_inr_per_pax_km:
+    name: INTERCITY_PREMIUM fare per passenger kilometre
+    value: 22.0
+    unit: "INR/(pax*km)"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Long-distance premium reference fare"
+  min_fare_inr:
+    name: minimum fare per request
+    value: 75.0
+    unit: "INR"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Floor fare convention"
+
+electricity:
+  offpeak_inr_per_kwh:
+    name: off-peak energy tariff
+    value: 6.5
+    unit: "INR/kWh"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Night charging tariff assumption"
+  shoulder_inr_per_kwh:
+    name: shoulder energy tariff
+    value: 9.2
+    unit: "INR/kWh"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Blended daytime tariff assumption"
+  peak_inr_per_kwh:
+    name: peak energy tariff
+    value: 12.8
+    unit: "INR/kWh"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Evening peak tariff assumption"
+  dc_fast_surcharge_inr_per_kwh:
+    name: DC fast-charging surcharge
+    value: 1.5
+    unit: "INR/kWh"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Public fast-charging premium"
+  peak_window_start_h:
+    name: peak tariff window start
+    value: 18
+    unit: "h"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Evening peak definition"
+  peak_window_end_h:
+    name: peak tariff window end
+    value: 23
+    unit: "h"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Evening peak definition"
+  offpeak_window_start_h:
+    name: off-peak window start
+    value: 23
+    unit: "h"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Night off-peak definition"
+  offpeak_window_end_h:
+    name: off-peak window end
+    value: 6
+    unit: "h"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Night off-peak definition"
+
+operating_costs:
+  maintenance_reserve_inr_per_km:
+    name: maintenance reserve per total kilometre
+    value: 1.8
+    unit: "INR/km"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Tyres, service, consumables reserve"
+  tyre_reserve_inr_per_km:
+    name: tyre wear reserve per kilometre
+    value: 0.7
+    unit: "INR/km"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Tyre wear allowance; not a roadworthiness assessment"
+  insurance_inr_per_day:
+    name: insurance allocation per vehicle-day
+    value: 320.0
+    unit: "INR/day"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Comprehensive cover allocation"
+  downtime_cost_inr_per_h:
+    name: opportunity cost of unplanned downtime
+    value: 95.0
+    unit: "INR/h"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Lost margin during unavailable hours"
+  driver_daily_cost_inr:
+    name: driver earnings demand per operating day
+    value: 900.0
+    unit: "INR/day"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Owner-operator draw used by the driver-economics panel"
+
+capital:
+  vehicle_capex_inr:
+    name: vehicle capital cost NEXUS_E
+    value: 1850000
+    unit: "INR"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Indicative demonstrator capex for the BEV configuration"
+  rex_capex_delta_inr:
+    name: additional capital cost of the range-extender configuration
+    value: 145000
+    unit: "INR"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Genset hardware and integration allowance"
+  finance_rate_per_year:
+    name: finance rate
+    value: 0.095
+    unit: "1/year"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Asset finance assumption"
+  depreciation_years:
+    name: depreciation horizon
+    value: 5
+    unit: "years"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Matches the commercial design-life assumption"
+  residual_fraction:
+    name: residual value fraction at horizon end
+    value: 0.15
+    unit: "-"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Residual value assumption"
+  battery_replacement_inr_per_kwh:
+    name: battery replacement cost
+    value: 8500
+    unit: "INR/kWh"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Pack replacement price used to monetise degradation"
+  daily_operating_km:
+    name: reference daily operating distance
+    value: 300
+    unit: "km/day"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Reference-case utilisation from the concept business case"
+
+reference_case:
+  tco_inr_per_km:
+    name: reference-case TCO output
+    value: 6.01
+    unit: "INR/km"
+    status: MODEL_ESTIMATE
+    source_or_rationale: "Reference-case model output from the concept business case; reproducible via experiments/benchmarks"
+  owner_driver_income_inr_per_day:
+    name: reference-case owner-driver operating income
+    value: 3644
+    unit: "INR/day"
+    status: MODEL_ESTIMATE
+    source_or_rationale: "Reference-case model output; not a guaranteed result"
+  operator_contribution_inr_per_vehicle_day:
+    name: reference-case operator contribution
+    value: 1934
+    unit: "INR/vehicle-day"
+    status: MODEL_ESTIMATE
+    source_or_rationale: "Reference-case model output; not a guaranteed result"
+  breakeven_km_per_day:
+    name: reference-case break-even distance
+    value: 63
+    unit: "km/day"
+    status: MODEL_ESTIMATE
+    source_or_rationale: "Reference-case model output; depends on the configured case"
+  utilisation_km_per_day:
+    name: reference-case utilisation
+    value: 300
+    unit: "km/day"
+    status: SCENARIO_ASSUMPTION
+    source_or_rationale: "Utilisation assumption behind the reference case"

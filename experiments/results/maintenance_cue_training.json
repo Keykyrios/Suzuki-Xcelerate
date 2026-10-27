@@ -1,0 +1,24 @@
+{
+  "model": "MaintenanceCueNet",
+  "provenance": "SYNTHETIC procedural training imagery",
+  "seed": 20260101,
+  "epochs": 14,
+  "train_samples": 4000,
+  "held_out_samples": 1000,
+  "held_out_accuracy": 0.897,
+  "per_class_recall": {
+    "no_obvious_issue_detected": 0.854,
+    "inspect": 0.94
+  },
+  "confusion_matrix": [
+    [
+      427,
+      73
+    ],
+    [
+      30,
+      470
+    ]
+  ],
+  "weights_path": "data/models/maintenance_cue_cnn.pt"
+}
